@@ -50,20 +50,41 @@ def find_player_stats(playerID):
     print(stats.to_string())
 
 
-def get_game_ids(season, season_type="Regular Season"):
+def get_game_ids(seasons, season_type="Regular Season"):
     """
     Returns all unique GAME_IDs for a given NBA season.
     season format: 'YYYY-YY' (e.g., '2023-24')
     season_type: 'Regular Season', 'Playoffs', 'Pre Season', 'All Star'
     """
     log = leaguegamelog.LeagueGameLog(
-        season=season,
+        season=seasons,
         season_type_all_star=season_type
     )
     df = log.get_data_frames()[0]
-    game_ids = df['GAME_ID'].unique().tolist()
+    game_ids = sorted(df['GAME_ID'].unique().tolist())
+
     return game_ids
 
-seasons = ["2023-24"]  # example list
+
+all_game_ids = {}
+
+def get_game_ids_for_seasons(seasons):
+
+    for season in seasons:
+        ids = get_game_ids(season)
+        all_game_ids[season] = ids
+        print(f"{season} contained {len(ids)} games")
+
+
+    df = pd.DataFrame(all_game_ids)
+    return df
+
+def panda_df_to_csv(df):
+    df.to_csv('regular_season_game_ids_2013-2025.csv', index=False)
+
+
+
+
+
 
 

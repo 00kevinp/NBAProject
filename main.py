@@ -1,4 +1,4 @@
-import finding_data as fd
+from NBAProject import finding_data as fd
 
 
 def main():
@@ -14,8 +14,9 @@ def main():
     # searchPlayer(playerName)
     # fd.find_player_stats(2544)
     # print(fd.efg(2544))
-    df = fd.get_game_ids("2023-2024", season_type="Playoffs")
-    print(df)
+    seasons = ["2012-13","2013-14", "2014-15", "2015-16", "2016-17", "2017-18", "2018-19", "2021-22","2022-23", "2023-24", "2024-25"]
+    df = fd.get_game_ids_for_seasons(seasons)
+    fd.panda_df_to_csv(df)
 
 
 
