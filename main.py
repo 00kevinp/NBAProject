@@ -1,5 +1,6 @@
 from NBAProject import finding_data as fd
 
+import pandas as pd
 
 def main():
     # root = tk.Tk()
@@ -14,9 +15,15 @@ def main():
     # searchPlayer(playerName)
     # fd.find_player_stats(2544)
     # print(fd.efg(2544))
-    seasons = ["2012-13","2013-14", "2014-15", "2015-16", "2016-17", "2017-18", "2018-19", "2021-22","2022-23", "2023-24", "2024-25"]
-    df = fd.get_game_ids_for_seasons(seasons)
-    fd.panda_df_to_csv(df)
+    # seasons = ["2024-25"]
+    # df = fd.get_game_info(seasons)
+    # print(df.head())
+
+    df = fd.iterate_over_csv("reg_season_game_ids_13-25.csv")
+    fd.df_to_csv(df, "team_stats_reg_season_no_covid.csv")
+    print("Data saved to team_stats_reg_season_no_covid.csv")
+    print(df)
+
 
 
 
