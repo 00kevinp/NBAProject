@@ -1,6 +1,8 @@
 ## Senior Capstone
 
 🏀 NBA Game Outcome Prediction
+
+
 📌 Overview
 
 This project predicts the outcome of NBA games using supervised machine learning trained on historical team statistics from the last 10 seasons (excluding the COVID-shortened 2019–2020 season). The system pulls historical data using the nba_api
