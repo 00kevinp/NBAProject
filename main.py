@@ -1,5 +1,7 @@
-from NBAProject import finding_data as fd
+from time import sleep
 
+from NBAProject import finding_data as fd
+import os
 import pandas as pd
 
 def main():
@@ -11,18 +13,22 @@ def main():
     # searchLabel = ttk.Label(mainWindow, text="Enter a current or former NBA player's name...")
     # searchLabel.grid(column=1, row=1, sticky=tk.W)
 
-    # playerName = input("Which player do you want to search for?\n")
-    # searchPlayer(playerName)
-    # fd.find_player_stats(2544)
-    # print(fd.efg(2544))
-    # seasons = ["2024-25"]
-    # df = fd.get_game_info(seasons)
-    # print(df.head())
 
-    df = fd.iterate_over_csv("reg_season_game_ids_13-25.csv")
-    fd.df_to_csv(df, "team_stats_reg_season_no_covid.csv")
-    print("Data saved to team_stats_reg_season_no_covid.csv")
-    print(df)
+
+    df = pd.read_csv("2012-24reg_season_statsv2.csv")
+    print(len(df))
+    print(len(fd.flattendf()) * 2)
+    print((len(fd.flattendf()) * 2) - len(df))
+    # 72 games missing from our data frame
+
+
+    # for n in fd.flattendf():
+    #     if n not in df and n :
+    #         print(n)
+
+#     size difference, need to figure out why
+
+
 
 
 

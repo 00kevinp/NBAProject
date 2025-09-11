@@ -10,7 +10,7 @@
 # I will request info from websites to extract the correct data, and list it accordingly.
 
 # Show progress from a players year-to-year stats by using graphs to display data
-
+import os
 import tkinter as tk
 from time import sleep, time
 from tkinter import ttk
@@ -25,6 +25,7 @@ from nba_api.stats.static import teams as tm
 nbaPlayers = players.get_players()
 nbaTeams = tm.get_teams()
 
+global last_game
 
 def df_to_csv(df, file_name):
     df.to_csv(file_name, index=False)
@@ -74,10 +75,9 @@ def get_game_ids(seasons, season_type="Regular Season"):
     return game_ids
 
 
-all_game_ids = {}
-all_game_stats = {}
 
 def get_game_ids_for_seasons(seasons):
+    all_game_ids = {}
 
     for season in seasons:
         ids = get_game_ids(season)
@@ -97,8 +97,6 @@ def game_details_boxscore(game_id):
     bs = boxscoresummaryv2.BoxScoreSummaryV2(game_id=game_id)
     print(f"Game Summary: {bs.game_summary.get_data_frame()} ")
     print(f"Line Score Summary: {bs.line_score.get_data_frame()}")
-    print(f"Other Stats Summary: {bs.other_stats.get_data_frame()}")
-    print(f"Team Stats Summary: {bs.team_stats.get_data_frame()}")
 
 
 
@@ -113,24 +111,29 @@ def melt_game_id_csv(game_id_csv):
     return game_ids_list
 
 
-def game_details_team_stats(game_ids):
+def game_details_team_stats(game_ids, progress_file="progressv3.csv"):
 
-    all_game_team_details = []
+    file_exists = os.path.isfile(progress_file)
     for game_id in game_ids:
+        print(f"Getting info for game ID {game_id}")
         team_stats = boxscoretraditionalv2.BoxScoreTraditionalV2(game_id=game_id)
         df = team_stats.team_stats.get_data_frame()
         df['GAME_ID'] = game_id
-        all_game_team_details.append(df)
 
+        df.to_csv(progress_file, mode="a", header=not file_exists, index=False)
+        file_exists = True
+        sleep(1.0)
 
-    return pd.concat(all_game_team_details, ignore_index=True)
-
+def delete_me(game_id):
+    team_stats = boxscoretraditionalv2.BoxScoreTraditionalV2(game_id=game_id)
+    df = team_stats.team_stats.get_data_frame()
+    return df
 
 def iterate_over_csv(csv_file, retries=4):
     all_game_team_stats = []
     counter = 0
     # df = pd.read_csv(csv_file, dtype=str)
-    for i in range(1, 12):
+    for i in range(1, 3):
         df = pd.read_csv(csv_file, dtype={f"C{i}":str})
         for game_id in df[f"C{i}"]:
             print(f"Fetching data for game ID: {game_id}")
@@ -158,5 +161,53 @@ def iterate_over_csv(csv_file, retries=4):
 
     return pd.concat(all_game_team_stats, ignore_index=True)
 
+
+
+
+def flattendf():
+    df = pd.read_csv("reg_season_game_ids_13-25.csv", dtype=str)
+    all_game_ids = []
+    for col in df.columns:
+        ids = df[col].dropna().tolist()
+        all_game_ids.extend(ids)
+
+    return all_game_ids
+def iterate_over_csv_in_batchesv2(batch_size, all_game_ids, last_game):
+
+
+    all_game_stats = []
+
+    all_game_ids = all_game_ids[last_game:]
+
+    print(f"starting at index: {last_game}")
+    print(f"translates to game ID: {all_game_ids[0]}")
+
+    for i in range(0, len(all_game_ids), batch_size):
+        batch = all_game_ids[i:i + batch_size]
+        for game_id in batch:
+            print(f"Fetching data for game ID: {game_id}")
+            success = True
+
+            while success:
+                try:
+                    team_stats = boxscoretraditionalv2.BoxScoreTraditionalV2(game_id=game_id)
+                    stats_df = team_stats.team_stats.get_data_frame()
+                    all_game_stats.append(stats_df)
+                    last_game = game_id
+                    sleep(0.6)
+                except requests.exceptions.ReadTimeout:
+                    success = False
+                    print(f"Timeout on game {game_id}, retrying...")
+                    sleep(3)
+
+            if not success:
+                print(f"Skipping game {game_id} after 3 failed attempts.")
+
+        # save progress after each batch
+        pd.concat(all_game_stats, ignore_index=True).to_csv("progress.csv", index=False)
+        with open("last_game.txt", "w") as f:
+            f.write(last_game)
+
+    return pd.concat(all_game_stats, ignore_index=True)
 
 
