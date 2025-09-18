@@ -1,3 +1,4 @@
+import re
 from time import sleep
 
 from NBAProject import finding_data as fd
@@ -16,17 +17,23 @@ def main():
 
 
     df = pd.read_csv("2012-24reg_season_statsv2.csv")
-    print(len(df))
-    print(len(fd.flattendf()) * 2)
-    print((len(fd.flattendf()) * 2) - len(df))
-    # 72 games missing from our data frame
+
+    x1 = set()
+    missing_vals = set()
+    for g_id in fd.flattendf():
+        x1.add(int((re.sub('^0+','',g_id))))
+
+    x2 = set()
+    for gg_id in df['GAME_ID']:
+        x2.add(gg_id)
+
+    # print(f"x1: {x1}")
+    # print(f"x2: {x2}")
 
 
-    # for n in fd.flattendf():
-    #     if n not in df and n :
-    #         print(n)
+    missing_vals = (x1-x2)
 
-#     size difference, need to figure out why
+
 
 
 
