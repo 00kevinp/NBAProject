@@ -165,7 +165,7 @@ def iterate_over_csv(csv_file, retries=4):
 
 
 def flattendf():
-    df = pd.read_csv("reg_season_game_ids_13-25.csv", dtype=str)
+    df = pd.read_csv("stats/reg_season_game_ids_13-25.csv", dtype=str)
     all_game_ids = []
     for col in df.columns:
         ids = df[col].dropna().tolist()
