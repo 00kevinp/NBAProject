@@ -211,3 +211,16 @@ def iterate_over_csv_in_batchesv2(batch_size, all_game_ids, last_game):
     return pd.concat(all_game_stats, ignore_index=True)
 
 
+
+def create_data_points_win_pct():
+    games = []
+    # games have the format of 21200001
+    # 2{season}{game}
+    # if len game is less than 4, pad 1 zero (21200999)
+    # else less than 3, pad 2 zeros (21200099)
+    # less than 2 pad 3 zeros (21200009)
+    game_prefix_2012 = "2120"
+    for i in range(1,1230):
+        game = game_prefix_2012 + str(i).zfill(5)
+        games.append(game)
+
