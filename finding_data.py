@@ -212,7 +212,59 @@ def iterate_over_csv_in_batchesv2(batch_size, all_game_ids, last_game):
 
 
 
+def tracking_advanced_metrics():
+    game = "0022200620"
+    box = boxscoreadvancedv2.BoxScoreAdvancedV2(game_id=game)
+    df = box.get_data_frames()
+    team_adv = df[1]
+
+    stats_to_keep = ["GAME_ID", "TEAM_NAME", "OFF_RATING", "DEF_RATING", "NET_RATING", "TS_PCT", "POSS", "PIE"]
+
+    team_subset = team_adv[stats_to_keep]
+    # print(team_subset)
+
+    og_df = pd.read_csv("stats/cleaned_regseason_no_covid.csv")
+
+    game_ids = set()
+
+    for gg in og_df["GAME_ID"]:
+        game_ids.add(str(gg))
+
+    game_ids = sorted(game_ids)
+
+    adv_stats = []
+
+    count = last_game = 0
+    for gid in game_ids[1200:]:
+        while count < 600:
+            gid = "00" + gid
+            last_game = int(gid)
+            try:
+                box = boxscoreadvancedv2.BoxScoreAdvancedV2(game_id=gid)
+                df = box.get_data_frames()
+                team_adv = df[1]
+                adv_stats.append(team_adv[stats_to_keep])
+                print(f"Fetching {gid} ...")
+                sleep(3)
+                count += 1
+                break
+            except requests.exceptions.ReadTimeout:
+                # back up in case sudden failure -- still write progress to file
+                adv_stats_df = pd.concat(adv_stats)
+                adv_stats_df.to_csv("adv_stats_progress.csv", mode='a', index=False)
+                print(f"Critical error. Last game: {last_game}")
+                break
+
+    print(f"Last game: {last_game}")
+    with open("file.txt", "a") as f:
+        f.write(str(last_game))
+    adv_stats_df = pd.concat(adv_stats)
+    adv_stats_df.to_csv("adv_stats_progress.csv", mode='a', index=False)
+
 def create_data_points_win_pct():
+    # use this to gather game_ids we want, and create a running stat win_pct in a new column
+
+    df = pd.read_csv("/Users/kevinpickelman/PycharmProjects/NBAStatsProject/stats/cleaned_regularseason_stats.csv")
     games = []
     # games have the format of 21200001
     # 2{season}{game}
@@ -220,7 +272,16 @@ def create_data_points_win_pct():
     # else less than 3, pad 2 zeros (21200099)
     # less than 2 pad 3 zeros (21200009)
     game_prefix_2012 = "2120"
-    for i in range(1,1230):
+    for i in range(1,1231):
         game = game_prefix_2012 + str(i).zfill(5)
         games.append(game)
 
+    for gg in games:
+        print(df[gg])
+
+
+def main():
+    create_data_points_win_pct()
+
+if __name__ == '__main__':
+    main()
