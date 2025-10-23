@@ -12,27 +12,6 @@ library(rpart.plot)
 library(doParallel)
 ```
 
-## Assignment Description
-
-In this project you are going to use the skills that you've learned about regression on a dataset of your own. You may choose any dataset that you wish as long as it is not one that we've already discussed in the course. You may want to consult me about your choice of dataset, just to make sure it is suitable. 
-
-After making a suitable dataset choice, you need to complete the following steps: 
-
-* Narrative: You need to formulate a question in which you can address using your chosen techniques. This is the overall goal of your analysis. 
-* You need to perform proper pre-processing and cleaning of the data before your analysis begins. Depending on your data, this step may be fairly short or quite lengthy.
-* You need to have a substantial exploratory data analysis (EDA) section. This section should include summaries, graphs (univariate, bivariate, and possibly multivariate), and other techniques from DS 1 to describe your data. You should also investigate possible interactions between variables. Your EDA should show a progression of understanding about the data and your research question.
-* You need to choose at least two regression techniques (most likely a multiple linear regression model and a penalized regression method) to use in your analysis. You should explain your modeling choices and how they were informed by your EDA. 
-* You need to address the assumptions of each method with graphical and/or numeric evidence.
-* You need to use cross-validation or a related method to compare the two or more methods.
-* You need to come to your final answer using an iterative process that you show throughout your project.
-* You need to discuss the shortcomings of your modeling approach. Also, if appropriate, you discuss improvements that could be made.
-* You need to discuss how the model approach/output works toward answering the question. 
-* You need to discuss your major takeaways from the project. This part is meant to be a reflection on what you learned about the data and your increase in knowledge about data science during the process of the project. 
-
-
-## Place Work Below
-
-### I made this dataset myself! It's a small portion of the dataset I've been working on for my senior research project. In this project I'll only need to make one small change, which is add a win/loss column for the training data.
 
 ```{r}
 set.seed(1010)
