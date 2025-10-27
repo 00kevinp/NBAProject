@@ -77,6 +77,7 @@ def get_game_ids(seasons, season_type="Regular Season"):
 
 
 def get_game_ids_for_seasons(seasons):
+    # seasons in format 2000-01, season_type = "Regular Season" by default through get_game_ids method
     all_game_ids = {}
 
     for season in seasons:
@@ -280,8 +281,76 @@ def create_data_points_win_pct():
         print(df[gg])
 
 
+
+def get_covid_games():
+    df = pd.read_csv("stats/covid_seasons_game_ids.csv")
+
+    game_ids = set()
+
+    for gg in df["GAME_ID"]:
+        game_ids.add(str(gg))
+
+    game_ids = sorted(game_ids)
+
+    stats = []
+
+    count = last_game = 0
+    for gid in game_ids[1800:2139]:
+
+        while count < 600:
+            last_game = int(gid)
+            print(f"Fetching {last_game}")
+            try:
+                box = boxscoretraditionalv2.BoxScoreTraditionalV2(game_id=gid)
+                df = box.get_data_frames()[1]
+                stats.append(df)
+                # print(stats)
+                sleep(2)
+                count += 1
+                break
+            except requests.exceptions.ReadTimeout:
+                # back up in case sudden failure -- still write progress to file
+                stats_df = pd.concat(stats)
+                stats_df.to_csv("covid_stats_progress.csv", index=False, mode='a')
+                print(f"Critical error. Last game: {last_game}")
+                break
+
+    print(f"Last game: {last_game}")
+    with open("last_game.txt", "a") as f:
+        f.write(str(last_game))
+    pd.concat(stats).to_csv("covid_stats_progress.csv", index=False, mode='a')
+
+
+def PIE_formula():
+
+    # PIE formula = (PTS + FGM + FTM – FGA – FTA + Deff.REB + Off.REB/2 + AST + STL + BLK/2 – PF – TO)
+    #       / (Game.PTS + Game.FGM + Game.FTM – Game.FGA – Game.FTA + Game.Deff.REB + Game.Off.REB/2
+    #       + Game.AST + Game.STL + Game.BLK/2 – Game.PF – Game.TO)
+
+    df = pd.read_csv("NBAProject/stats/covid_data.csv")
+    game_totals = df.groupby("GAME_ID").sum(numeric_only=True).reset_index()
+    df = df.merge(game_totals, on="GAME_ID", suffixes=("", "_game"))
+    df["PIE"] = (
+            (df["PTS"] + df["FGM"] + df["FTM"] - df["FGA"] - df["FTA"] +
+             df["DREB"] + (df["OREB"] / 2) + df["AST"] + df["STL"] +
+             (df["BLK"] / 2) - df["PF"] - df["TO"]) /
+            (df["PTS_game"] + df["FGM_game"] + df["FTM_game"] - df["FGA_game"] - df["FTA_game"] +
+             df["DREB_game"] + (df["OREB_game"] / 2) + df["AST_game"] + df["STL_game"] +
+             (df["BLK_game"] / 2) - df["PF_game"] - df["TO_game"])
+    )  * 100
+
+    df["PIE"] = df["PIE"].round(2)
+
+    df.drop(columns=[col for col in df.columns if col.endswith("_game")], inplace=True)
+    # drop old labels from game totals
+
+    df.to_csv("NBAProject/stats/cleaned_covidseasons_with_PIE.csv", index=False)
+
+
+
 def main():
-    create_data_points_win_pct()
+    pass
+
 
 if __name__ == '__main__':
     main()

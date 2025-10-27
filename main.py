@@ -11,13 +11,14 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 
 
+# i think we can actually go without scraping advanced metrics
+# we actually can use existing stats to estimate possessions, we can accurately measure PIE rating and win_pct
+
 def main():
+
 
     pass
 
-
-# i think we can actually go without scraping advanced metrics
-# we actually can use existing stats to estimate possessions, we can accurately measure PIE rating and win_pct
 
 
 if __name__ == '__main__':
