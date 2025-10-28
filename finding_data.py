@@ -348,9 +348,15 @@ def PIE_formula():
 
 
 
-def main():
-    pass
+def indicate_covid():
+    df_ = pd.read_csv("NBAProject/stats/final_covid_data.csv")
+    df = pd.read_csv("NBAProject/stats/final_regseason_data.csv")
+
+    df_["COVID_FLAG"] = 1
+    df['COVID_FLAG'] = 0
+
+    combined_df = pd.concat([df, df_], ignore_index=True)
+    combined_df = combined_df.sort_values(by="GAME_ID").reset_index(drop=True)
 
 
-if __name__ == '__main__':
-    main()
+    combined_df.to_csv("NBAProject/stats/combined_final_data.csv", index=False)
