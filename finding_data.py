@@ -360,3 +360,35 @@ def indicate_covid():
 
 
     combined_df.to_csv("NBAProject/stats/combined_final_data.csv", index=False)
+
+
+def make_home_team_col():
+    df = pd.read_csv("NBAProject/stats/Games.csv")
+    my_df = pd.read_csv("NBAProject/stats/combined_final_data.csv")
+
+    df['gameId'].rename('GAME_ID')
+    merged = my_df.merge(
+        df[['gameId', 'hometeamName']],
+        left_on='GAME_ID',
+        right_on='gameId',
+        how='left'
+    )
+
+    merged = merged.drop(columns=['gameId'])
+    merged.to_csv("NBAProject/stats/combined_final_dataV2.csv")
+
+
+
+def rename_home_team_col():
+    df = pd.read_csv("NBAProject/stats/combined_final_dataV2.csv")
+    df.rename(columns={'hometeamName': 'HOME_TEAM'}, inplace=True)
+    df.to_csv("NBAProject/stats/combined_final_dataV2.csv")
+
+def move_around_columns():
+    df = pd.read_csv("NBAProject/stats/combined_final_dataV2.csv")
+    col_to_move = df.pop('HOME_TEAM')  # Remove 'ColC' and store its data
+    df.insert(5, 'HOME_TEAM', col_to_move)  # Insert 'ColC' at index 1
+    df.to_csv("NBAProject/stats/combined_final_dataV2.csv")
+
+if __name__ == '__main__':
+    move_around_columns()
