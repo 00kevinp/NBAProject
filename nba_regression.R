@@ -1,19 +1,8 @@
----
-title: "Predicting NBA Wins During the Covid Regular Seasons (2019, 2020)"
-author: "Kevin Pickelman"
-format: pdf
----
-
-```{r}
 library("dplyr")
 library(tidymodels)
 library(rpart)
 library(rpart.plot)
 library(doParallel)
-```
-
-
-```{r}
 set.seed(1010)
 
 # pre-processing data
@@ -200,5 +189,3 @@ data.frame(
   logistic_regression = mean(df$predicted_result == df$result),
   decision_tree = mean(preds$result)
 )
-```
-
