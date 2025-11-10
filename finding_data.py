@@ -390,5 +390,23 @@ def move_around_columns():
     df.insert(5, 'HOME_TEAM', col_to_move)  # Insert 'ColC' at index 1
     df.to_csv("NBAProject/stats/combined_final_dataV2.csv")
 
+
+def make_win_pct():
+    df = pd.read_csv("NBAProject/stats/final_data.csv")
+    # if 'W' in df.columns and 'L' in df.columns and 'TEAM_ID' in df.columns and 'SEASON' in df.columns:
+    #     # Group by TEAM and SEASON, calculate win percentage
+    #     df['WIN_PCT'] = df['W'] / (df['W'] + df['L'])
+    #
+    # print(df.head(12))
+    df['GAME_ID'] = df['GAME_ID'].astype(str)
+    prefixes = ('212', '213', '214')
+
+    df['SEASON'] = "12" if df['GAME_ID'].str.startswith('212') else 0
+
+    print(df.head())
+
+#     create season column based on GAME_ID
+#     create win percentage column
+#     model
 if __name__ == '__main__':
-    move_around_columns()
+    make_win_pct()
